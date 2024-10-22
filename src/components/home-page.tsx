@@ -10,35 +10,34 @@ const heroContent = [
   { title: "Now Open.", color: "#547A48" },
 ];
 
-const menuCategories = ["Breakfast", "Lunch", "Drinks"];
+const menuCategories = ["Breakfast", "Lunch", "Drinks"] as const;
 
-// Define the menu items type
+type MenuCategory = (typeof menuCategories)[number];
+
 type MenuItem = {
   name: string;
   price: string;
 };
 
-type MenuCategories = {
-  Breakfast: MenuItem[];
-  Lunch: MenuItem[];
-  Drinks: MenuItem[];
+type MenuItems = {
+  [K in MenuCategory]: MenuItem[];
 };
 
-const menuItems: MenuCategories = {
+const menuItems: MenuItems = {
   Breakfast: [
-    { name: "Eggs Benedict", price: "$12" },
-    { name: "Avocado Toast", price: "$10" },
-    { name: "Pancakes", price: "$8" },
+    { name: "Avocado Toast", price: "$18" },
+    { name: "Eggs Benedict", price: "$20" },
+    { name: "Granola Bowl", price: "$16" },
   ],
   Lunch: [
-    { name: "Caesar Salad", price: "$14" },
-    { name: "Chicken Sandwich", price: "$16" },
-    { name: "Veggie Burger", price: "$15" },
+    { name: "Chicken Salad", price: "$22" },
+    { name: "Veggie Burger", price: "$24" },
+    { name: "Salmon Poke", price: "$26" },
   ],
   Drinks: [
-    { name: "Latte", price: "$4" },
-    { name: "Iced Tea", price: "$3" },
-    { name: "Smoothie", price: "$6" },
+    { name: "Flat White", price: "$5" },
+    { name: "Cold Brew", price: "$6" },
+    { name: "Matcha Latte", price: "$7" },
   ],
 };
 
@@ -47,29 +46,23 @@ const storyContent = [
     title: "Passion",
     content:
       "Young Dandy celebrates Auckland's vibrant food culture, believing in the power of perfectly crafted coffee and meals to brighten days and bring people together.",
-    icon: "☕️",
   },
   {
     title: "Quality",
     content:
       "We carefully source the finest local ingredients, from farm-fresh eggs to artisanal breads, ensuring quality is at the heart of everything we serve.",
-    icon: "🥚",
   },
   {
     title: "Ambiance",
     content:
       "Our cafe is designed as a warm, inviting space where aesthetics meet comfort, creating the perfect environment for good food and great company to flourish.",
-    icon: "🪴",
   },
 ];
 
-const googleMapsEmbedUrl =
-  "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3192.5785269419396!2d174.77559661744384!3d-36.85811!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6d0d47f1d1b1b1b1%3A0x500ef6143a2e900!2s118%20Parnell%20Rd%2C%20Parnell%2C%20Auckland%201052%2C%20New%20Zealand!5e0!3m2!1sen!2sus!4v1651234567890!5m2!1sen!2sus";
-
-export function HomePageComponent() {
+export default function HomePage() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [activeCategory, setActiveCategory] =
-    useState<keyof MenuCategories>("Breakfast");
+    useState<MenuCategory>("Breakfast");
   const [isMapOpen, setIsMapOpen] = useState(false);
   const [activeStoryIndex, setActiveStoryIndex] = useState(0);
 
@@ -162,9 +155,7 @@ export function HomePageComponent() {
             {menuCategories.map((category) => (
               <button
                 key={category}
-                onClick={() =>
-                  setActiveCategory(category as keyof MenuCategories)
-                }
+                onClick={() => setActiveCategory(category)}
                 className={`px-4 py-2 mx-2 text-lg font-medium transition-colors duration-300 ${
                   activeCategory === category
                     ? "text-black border-b-2 border-black"
@@ -184,20 +175,18 @@ export function HomePageComponent() {
               transition={{ duration: 0.3 }}
               className="space-y-6"
             >
-              {(menuItems[activeCategory as keyof typeof menuItems] || []).map(
-                (item, index) => (
-                  <motion.div
-                    key={item.name}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3, delay: index * 0.1 }}
-                    className="flex justify-between items-center py-3 border-b border-gray-200"
-                  >
-                    <span className="text-lg">{item.name}</span>
-                    <span className="text-lg font-medium">{item.price}</span>
-                  </motion.div>
-                )
-              )}
+              {menuItems[activeCategory].map((item, index) => (
+                <motion.div
+                  key={item.name}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: index * 0.1 }}
+                  className="flex justify-between items-center py-3 border-b border-gray-200"
+                >
+                  <span className="text-lg">{item.name}</span>
+                  <span className="text-lg font-medium">{item.price}</span>
+                </motion.div>
+              ))}
             </motion.div>
           </AnimatePresence>
         </div>
@@ -206,35 +195,25 @@ export function HomePageComponent() {
       {/* Our Story Section */}
       <section
         ref={aboutRef}
-        className="min-h-screen bg-[#F8F8F8] text-black py-20 px-4 sm:px-6 lg:px-8"
+        className="min-h-screen bg-white text-black py-20 px-4 sm:px-6 lg:px-8"
       >
         <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-16 text-center">
           Our Story
         </h2>
-        <div className="max-w-5xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12">
             {storyContent.map((story, index) => (
-              <motion.div
+              <motion.button
                 key={story.title}
-                className="bg-white rounded-2xl shadow-lg overflow-hidden cursor-pointer"
-                whileHover={{ scale: 1.05 }}
-                transition={{ type: "spring", stiffness: 300 }}
+                className={`text-2xl font-medium mb-4 md:mb-0 ${
+                  index === activeStoryIndex ? "text-black" : "text-gray-400"
+                }`}
                 onClick={() => setActiveStoryIndex(index)}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
-                <div
-                  className={`h-40 flex items-center justify-center text-6xl ${
-                    index === activeStoryIndex
-                      ? "bg-black text-white"
-                      : "bg-gray-100 text-black"
-                  }`}
-                >
-                  {story.icon}
-                </div>
-                <div className="p-6">
-                  <h3 className="text-2xl font-semibold mb-2">{story.title}</h3>
-                  <p className="text-gray-600 line-clamp-3">{story.content}</p>
-                </div>
-              </motion.div>
+                {story.title}
+              </motion.button>
             ))}
           </div>
           <AnimatePresence mode="wait">
@@ -244,12 +223,15 @@ export function HomePageComponent() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.5 }}
-              className="mt-12 bg-white rounded-2xl shadow-lg p-8"
+              className="relative"
             >
-              <h3 className="text-3xl font-semibold mb-4">
-                {storyContent[activeStoryIndex].title}
-              </h3>
-              <p className="text-xl leading-relaxed">
+              <motion.div
+                className="absolute -left-4 top-0 w-1 h-full bg-black"
+                initial={{ scaleY: 0 }}
+                animate={{ scaleY: 1 }}
+                transition={{ duration: 0.5 }}
+              />
+              <p className="text-xl leading-relaxed pl-4">
                 {storyContent[activeStoryIndex].content}
               </p>
             </motion.div>
@@ -278,11 +260,12 @@ export function HomePageComponent() {
               <p className="mb-4">118 Parnell Road, Auckland</p>
               <div className="aspect-video w-full">
                 <iframe
-                  src={googleMapsEmbedUrl}
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3192.3646790549584!2d174.77931121547894!3d-36.85853497993838!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6d0d47fb5a9ce6fb%3A0x500ef6143a2d500!2s118%20Parnell%20Rd%2C%20Parnell%2C%20Auckland%201052%2C%20New%20Zealand!5e0!3m2!1sen!2sus!4v1635444331789!5m2!1sen!2sus"
+                  width="100%"
+                  height="100%"
                   style={{ border: 0 }}
                   allowFullScreen
                   loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
                 ></iframe>
               </div>
               <div className="mt-4 flex justify-end">
