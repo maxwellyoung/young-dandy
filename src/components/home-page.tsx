@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { client } from "@/lib/sanity";
 
 const heroContent = [
   { title: "Morning Brews.", color: "#FFF6AF" },
@@ -15,6 +16,7 @@ const menuCategories = ["Breakfast", "Lunch", "Drinks"] as const;
 type MenuCategory = (typeof menuCategories)[number];
 
 type MenuItem = {
+  _id: string;
   name: string;
   price: string;
 };
@@ -23,22 +25,11 @@ type MenuItems = {
   [K in MenuCategory]: MenuItem[];
 };
 
-const menuItems: MenuItems = {
-  Breakfast: [
-    { name: "Avocado Toast", price: "$18" },
-    { name: "Eggs Benedict", price: "$20" },
-    { name: "Granola Bowl", price: "$16" },
-  ],
-  Lunch: [
-    { name: "Chicken Salad", price: "$22" },
-    { name: "Veggie Burger", price: "$24" },
-    { name: "Salmon Poke", price: "$26" },
-  ],
-  Drinks: [
-    { name: "Flat White", price: "$5" },
-    { name: "Cold Brew", price: "$6" },
-    { name: "Matcha Latte", price: "$7" },
-  ],
+type SanityMenuItem = {
+  _id: string;
+  name: string;
+  price: string;
+  category: MenuCategory;
 };
 
 const storyContent = [
@@ -69,11 +60,39 @@ export default function HomePage() {
   const menuRef = useRef<HTMLElement>(null);
   const aboutRef = useRef<HTMLElement>(null);
 
+  const [menuItems, setMenuItems] = useState<MenuItems>({
+    Breakfast: [],
+    Lunch: [],
+    Drinks: [],
+  });
+
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % heroContent.length);
     }, 5000);
     return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    const fetchMenuItems = async () => {
+      const query = `*[_type == "menuItem"]{
+        _id,
+        name,
+        price,
+        category
+      }`;
+      const items: SanityMenuItem[] = await client.fetch(query);
+      const categorizedItems = items.reduce((acc, item) => {
+        if (!acc[item.category]) {
+          acc[item.category] = [];
+        }
+        acc[item.category].push(item);
+        return acc;
+      }, {} as MenuItems);
+      setMenuItems(categorizedItems);
+    };
+
+    fetchMenuItems();
   }, []);
 
   const scrollToSection = (ref: React.RefObject<HTMLElement>) => {
@@ -175,9 +194,9 @@ export default function HomePage() {
               transition={{ duration: 0.3 }}
               className="space-y-6"
             >
-              {menuItems[activeCategory].map((item, index) => (
+              {menuItems[activeCategory]?.map((item, index) => (
                 <motion.div
-                  key={item.name}
+                  key={item._id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3, delay: index * 0.1 }}
