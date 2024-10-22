@@ -260,12 +260,12 @@ export default function HomePage() {
               <p className="mb-4">118 Parnell Road, Auckland</p>
               <div className="aspect-video w-full">
                 <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3192.3646790549584!2d174.77931121547894!3d-36.85853497993838!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6d0d47fb5a9ce6fb%3A0x500ef6143a2d500!2s118%20Parnell%20Rd%2C%20Parnell%2C%20Auckland%201052%2C%20New%20Zealand!5e0!3m2!1sen!2sus!4v1635444331789!5m2!1sen!2sus"
-                  width="100%"
-                  height="100%"
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3192.558756914432!2d174.77659767698628!3d-36.85304227974718!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6d0d49bfab7905e3%3A0x74837bf48f7ea5c3!2sYoung%20Dandy%20Cafe!5e0!3m2!1sen!2snz!4v1729576961700!5m2!1sen!2snz"
+                  width="600"
+                  height="450"
                   style={{ border: 0 }}
-                  allowFullScreen
                   loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
                 ></iframe>
               </div>
               <div className="mt-4 flex justify-end">
