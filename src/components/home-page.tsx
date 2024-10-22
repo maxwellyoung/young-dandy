@@ -95,7 +95,7 @@ export default function HomePage() {
             style={{ backgroundColor: heroContent[currentIndex].color }}
           >
             <motion.h1
-              className="text-6xl sm:text-7xl md:text-8xl font-bold text-black"
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-black text-center px-4"
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.2, duration: 0.5 }}
